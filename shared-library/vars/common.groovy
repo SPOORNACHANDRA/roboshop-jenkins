@@ -1,14 +1,50 @@
 def compile() {
-    if (env.codetype == "maven") {
-        print 'maven'
+    if (env.codeType == "python" || env.codeType == "static") {
+        return "Return, Do not need Compilation"
     }
-    if (env.codetype == "nodejs") {
-        print 'nodejs'
+
+    stage('Compile Code') {
+        if (env.codeType == "maven") {
+            sh '/home/centos/maven/bin/mvn package'
+        }
+
+        if (env.codeType == "nodejs") {
+            sh 'npm install'
+        }
+
     }
-    if (env.codetype == "python") {
-        print 'python'
+
+}
+
+def test() {
+    stage('Test Cases') {
+        if (env.codeType == "maven") {
+            //sh '/home/centos/maven/bin/mvn test'
+            print 'OK'
+        }
+
+        if (env.codeType == "nodejs") {
+            //sh 'npm test'
+            print 'OK'
+        }
+
+        if (env.codeType == "python") {
+            //sh 'python3.6 -m unittest'
+            print 'OK'
+        }
+
     }
-    if (env.codetype == "static") {
-        print 'static'
+}
+
+
+def codeQuality() {
+    stage('Code Quality') {
+            print 'OK'
+    }
+}
+
+def release() {
+    stage('release') {
+        print 'release'
     }
 }

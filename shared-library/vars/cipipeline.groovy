@@ -1,22 +1,34 @@
 def call() {
 
     node('workstation') {
-        sh "find . | sed -e '1d' | xargs rm -rf "
-        git branch: 'main', url: "https://github.com/SPOORNACHANDRA/${component}"
-        stage('compile code') {
+
+        sh "find . | sed -e '1d' |xargs rm -rf"
+        if(env.TAG_NAME ==~ ".*") {
+            env.branch_name = "refs/tags/${env.TAG_NAME}"
+        } else {
+            env.branch_name = "${env.BRANCH_NAME}"
+        }
+        checkout scmGit(
+                branches: [[name: branch_name]],
+                userRemoteConfigs: [[url: "https://github.com/SPOORNACHANDRA/${component}"]]
+        )
+
+        if(env.TAG_NAME ==~ ".*") {
             common.compile()
+            common.release()
+        } else {
+            if(env.BRANCH_NAME == "main") {
+                common.compile()
+                common.test()
+                common.codeQuality()
+                common.codeSecurity()
+            } else {
+                common.compile()
+                common.test()
+                common.codeQuality()
+            }
         }
-        stage('Test') {
-            print 'hello'
-        }
-        stage('code Quality') {
-            print 'hello'
-        }
-        stage('code Security') {
-            print 'hello'
-        }
-        stage('Release') {
-            print 'hello'
-        }
+
     }
+
 }
